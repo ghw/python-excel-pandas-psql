@@ -42,8 +42,8 @@ def test_removing_temp_files():
 	assert dir_func.remove_temporary_files(
 		file_list=['~$abc.xlsx', 'abc.xlsx']
 	).sort() == [
-		'abc.xlsx'
-	].sort()
+			   'abc.xlsx'
+		   ].sort()
 
 
 def test_get_all_files_nonrecursive():
@@ -52,8 +52,8 @@ def test_get_all_files_nonrecursive():
 		pattern='*.log',
 		recursive=False
 	).sort() == [
-		os.path.join(os.path.dirname(__file__), 'test_folder', 'file_in_folder_1.log')
-	].sort()
+			   os.path.join(os.path.dirname(__file__), 'test_folder', 'file_in_folder_1.log')
+		   ].sort()
 
 
 def test_get_all_files_recursive():
@@ -62,10 +62,10 @@ def test_get_all_files_recursive():
 		pattern='*.log',
 		recursive=True
 	).sort() == [
-		os.path.join(os.path.dirname(__file__), 'test_folder', 'file_in_folder_1.log'),
-		os.path.join(os.path.dirname(__file__), 'test_folder', 'test_subfolder', 'file_in_subfolder_1.log'),
-		os.path.join(os.path.dirname(__file__), 'test_folder', 'test_subfolder', 'file_in_subfolder_2.log')
-	].sort()
+			   os.path.join(os.path.dirname(__file__), 'test_folder', 'file_in_folder_1.log'),
+			   os.path.join(os.path.dirname(__file__), 'test_folder', 'test_subfolder', 'file_in_subfolder_1.log'),
+			   os.path.join(os.path.dirname(__file__), 'test_folder', 'test_subfolder', 'file_in_subfolder_2.log')
+		   ].sort()
 
 
 def test_get_latest_file():
@@ -73,12 +73,3 @@ def test_get_latest_file():
 		folder_path=os.path.join(os.path.dirname(__file__), 'test_folder'),
 		pattern='*.log'
 	) == os.path.join(os.path.dirname(__file__), 'test_folder', 'file_in_folder_1.log')
-
-
-# def get_all_files_from_path(self, folder_path=None, pattern=None, recursive=None):
-#
-# def get_latest_file(self, folder_path=None, pattern=None):
-#
-# def get_abs_path(self, path=None):
-#
-# def get_full_abs_path(self, folder_path=None, filename=None):
