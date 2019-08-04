@@ -2,6 +2,7 @@ import os.path
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 from src.general.ListFunc import ListFunc as ListFunc
 
 list_func = ListFunc()
