@@ -58,7 +58,7 @@ class PostgresPandas(object):
 		dataframe.to_csv(csv_io, sep=csv_sep, encoding='utf-8-sig',
 						 header=False, index=False, na_rep=csv_null_rep)
 		csv_contents = csv_io.getvalue()
-		csv_contents = re.sub(r'NaT', '#N/A', csv_contents)
+		csv_contents = re.sub(r'NaT', csv_null_rep, csv_contents)
 		csv_io.seek(0)
 		csv_io.write(csv_contents)
 
