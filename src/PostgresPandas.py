@@ -21,25 +21,25 @@ class PostgresPandas(object):
 		self.username = username
 		self.password = password
 
-	def set_database_connectors(self):
+	def get_database_connectors(self):
 		db_conn_string = 'postgresql://{0}:{1}@{2}/{3}'.format(
 			self.username, self.password, self.host, self.database
 		)
-		self.engine = create_engine(db_conn_string)
-		self.conn = engine.raw_connection()
-		self.cur = conn.cursor()
-		return
+		engine = create_engine(db_conn_string)
+		conn = engine.raw_connection()
+		cur = conn.cursor()
+		return engine, conn, cur
 
-	def close_database_connectors(self):
-		self.conn.commit()
-		self.cur.close()
-		self.conn.close()
+	def close_database_connectors(self, engine=None, conn=None, cur=None):
+		conn.commit()
+		cur.close()
+		conn.close()
 		return
 
 	def get_psql_query_results_as_dataframe(self, query=None):
-		self.set_database_connectors()
-		df = pd.read_sql_query(query, con=self.engine)
-		self.close_database_connectors()
+		engine, conn, cur = self.get_database_connectors()
+		df = pd.read_sql_query(query, con=engine)
+		self.close_database_connectors(engine, conn, cur)
 		return df
 
 	def send_dataframe_to_psql(self, dataframe=None, schema_name=None, table_name=None):
@@ -47,7 +47,7 @@ class PostgresPandas(object):
 		if table_name is None: return
 		if schema_name is None: schema_name = 'public'
 
-		self.set_database_connectors()
+		engine, conn, cur = self.get_database_connectors()
 
 		# general csv features
 		csv_sep = '\t'
@@ -67,8 +67,7 @@ class PostgresPandas(object):
 		cur.copy_from(csv_io, '{0}.{1}'.format(schema_name, table_name),
 					  columns=dataframe.columns.tolist(),
 					  sep=csv_sep, null=csv_null_rep)
-
 		csv_io.close()
 
-		self.close_database_connectors()
+		self.close_database_connectors(engine, conn, cur)
 		return
