@@ -45,7 +45,7 @@ def test_008_clean_snake_case():
 
 
 def test_009_to_alpha_numeric():
-	assert str_func.to_alpha_numeric('abc yyyy/mm/dd', replace_string='_') == 'abc_yyyy_mm_dd'
+	assert str_func.text_to_alpha_numeric('abc yyyy/mm/dd', replace_string='_') == 'abc_yyyy_mm_dd'
 
 
 def test_010_text_to_camel_case_upper():

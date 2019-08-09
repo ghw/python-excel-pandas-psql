@@ -23,7 +23,7 @@ class StrFunc(object):
 		snake_clean = re.sub('_+', '_', self.remove_accent(text))
 		return snake_clean
 
-	def to_alpha_numeric(self, text=None, replace_string=None):
+	def text_to_alpha_numeric(self, text=None, replace_string=None):
 		if replace_string is None: replace_string = '_'
 		alphanumeric = re.sub('[^a-zA-Z0-9]+', replace_string, self.remove_accent(text))
 		return alphanumeric
