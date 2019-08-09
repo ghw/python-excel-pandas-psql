@@ -71,3 +71,71 @@ class PostgresPandas(object):
 
 		self.close_database_connectors(engine, conn, cur)
 		return
+
+	# UNTESTED ...
+
+	def get_psql_array_format_of_python_list(self, python_list=None):
+		psql_array = '({0})'.format(str(python_list)[1:-1])
+		return psql_array
+
+	def execute_query(self, query=None):
+		engine, conn, cur = self.get_database_connectors()
+		cur.execute(query)
+		self.close_database_connectors(engine, conn, cur)
+		return
+
+	def drop_table(self, schema_name=None, table_name=None):
+		del_command = 'DROP TABLE IF EXISTS {0}."{1}";'.format(schema_name, table_name)
+		self.execute_query(del_command)
+		return
+
+	def create_table_as(self, query=None, schema_name=None, table_name=None):
+		create_command = 'CREATE TABLE {0}."{1}" AS {2}'.format(schema_name, table_name, query)
+		self.execute_query(query=create_command)
+		return
+
+	def create_table(self, schema_name=None, table_name=None, column_name_type_dict=None):
+		column_types = ', '.join(['{0} {1}'.format(col_n, col_t)
+								  for col_n, col_t in column_name_type_dict.items()])
+		create_command = 'CREATE TABLE {0}."{1}" ({2});'.format(schema_name, table_name, column_types)
+		self.execute_query(query=create_command)
+		return
+
+	def get_dict_of_column_name_to_type_from_dataframe_for_psql(self, dataframe=None):
+		pandas_dtype_to_psql_column_type_dict = {
+			"int64": "int",
+			"int32": "int",
+			"float32": "decimal",
+			"float64": "decimal",
+			"datetime64[ns]": "timestamp",
+			"bool": "boolean",
+			"array[object]": "character varying(256)[]"
+		}
+
+		pandas_column_name_type_dict = pd_func.get_dict_of_column_name_to_type_from_dataframe(dataframe)
+		psql_column_name_type_dict = dict()
+
+		for k, v in pandas_column_name_type_dict.items():
+			if v != 'object':
+				psql_column_name_type_dict[k] = pandas_dtype_to_psql_column_type_dict[v]
+			else:
+				max_number_of_characters = pd_func.get_maximum_length_of_dtype_object_values(
+					dataframe=dataframe, column_name=k
+				)
+				if max_number_of_characters <= 2056:
+					psql_column_name_type_dict[k] = 'character varying({})'.format(max_number_of_characters)
+				else:
+					psql_column_name_type_dict[k] = 'text'
+
+		return psql_column_name_type_dict
+
+	def clean_delimiter_from_dataframe_column(self, dataframe=None):
+
+		object_column_list = pd_func.get_column_names_by_type(dataframe=dataframe, column_dtype='object')
+		for obj_col in object_column_list:
+			dataframe[obj_col] = dataframe[obj_col].str. \
+				replace('\t', ' ', regex=True). \
+				replace('\r\n', '', regex=True). \
+				replace('\n', '', regex=True). \
+				replace('"', '\'', regex=True). \
+				replace(',', '\|', regex=True)
