@@ -40,7 +40,7 @@ class StrFunc(object):
 	def camel_case_to_snake_case(self, text=None, case=None):
 		if case is None: case = 'lower'
 		first_cap_regexp = re.compile('(.)([A-Z][a-z]+)')
-		all_cap_regexp = re.compile('([a-z0-9])([A-Z])')
+		all_cap_regexp = re.compile('([a-z0-9])([A-Z0-9])')
 
 		snake_temp = first_cap_regexp.sub(r'\1_\2', self.remove_accent(text))
 		snake = all_cap_regexp.sub(r'\1_\2', snake_temp).lower()
