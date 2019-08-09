@@ -9,10 +9,9 @@ import itertools
 
 from src.general.StrFunc import StrFunc
 
-str_func = StrFunc()
-
 
 class PandasFunc(object):
+	str_func = StrFunc()
 
 	def __init__(self):
 		pass
@@ -50,11 +49,11 @@ class PandasFunc(object):
 		return np.array_equal(column_values, column_values.astype(int))
 
 	def set_column_names_to_alpha_numeric(self, dataframe=None):
-		columns_as_alpha_numeric = list(map(str_func.text_to_alpha_numeric, dataframe.columns))
+		columns_as_alpha_numeric = list(map(self.str_func.text_to_alpha_numeric, dataframe.columns))
 		dataframe.columns = columns_as_alpha_numeric
 
 	def set_column_names_to_snake_case(self, dataframe=None):
-		columns_as_snake_case = list(map(str_func.text_to_snake_case, dataframe.columns))
+		columns_as_snake_case = list(map(self.str_func.text_to_snake_case, dataframe.columns))
 		dataframe.columns = columns_as_snake_case
 
 	def exists_unnamed_headers(self, dataframe=None):

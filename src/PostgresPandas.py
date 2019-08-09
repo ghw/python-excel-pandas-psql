@@ -10,10 +10,9 @@ from sqlalchemy import create_engine
 
 from src.general.PandasFunc import PandasFunc
 
-pd_func = PandasFunc()
-
 
 class PostgresPandas(object):
+	pd_func = PandasFunc()
 
 	def __init__(self, host=None, database=None, username=None, password=None):
 		self.host = host
@@ -112,14 +111,14 @@ class PostgresPandas(object):
 			"array[object]": "character varying(256)[]"
 		}
 
-		pandas_column_name_type_dict = pd_func.get_dict_of_column_name_to_type_from_dataframe(dataframe)
+		pandas_column_name_type_dict = self.pd_func.get_dict_of_column_name_to_type_from_dataframe(dataframe)
 		psql_column_name_type_dict = dict()
 
 		for k, v in pandas_column_name_type_dict.items():
 			if v != 'object':
 				psql_column_name_type_dict[k] = pandas_dtype_to_psql_column_type_dict[v]
 			else:
-				max_number_of_characters = pd_func.get_maximum_length_of_dtype_object_values(
+				max_number_of_characters = self.pd_func.get_maximum_length_of_dtype_object_values(
 					dataframe=dataframe, column_name=k
 				)
 				if max_number_of_characters <= 2056:
@@ -131,7 +130,7 @@ class PostgresPandas(object):
 
 	def clean_delimiter_from_dataframe_column(self, dataframe=None):
 
-		object_column_list = pd_func.get_column_names_by_type(dataframe=dataframe, column_dtype='object')
+		object_column_list = self.pd_func.get_column_names_by_type(dataframe=dataframe, column_dtype='object')
 		for obj_col in object_column_list:
 			dataframe[obj_col] = dataframe[obj_col].str. \
 				replace('\t', ' ', regex=True). \
