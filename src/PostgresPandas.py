@@ -14,8 +14,9 @@ from src.general.PandasFunc import PandasFunc
 class PostgresPandas(object):
 	pd_func = PandasFunc()
 	null_identifier = {
-		'int32': -1234567890
-		'int64': -1234567890
+		'int32': -1234567890,
+		'int64': -1234567890,
+		'general': '#N/A'
 	}
 
 	def __init__(self, host=None, database=None, username=None, password=None):
@@ -67,14 +68,13 @@ class PostgresPandas(object):
 
 		# general csv features
 		csv_sep = '\t'
-		csv_null_rep = '#N/A'
 
 		# save dataframe as temp csv
 		csv_io = io.StringIO()
 		dataframe_for_upload.to_csv(csv_io, sep=csv_sep, encoding='utf-8-sig',
-									header=False, index=False, na_rep=csv_null_rep)
+									header=False, index=False, na_rep=self.null_identifier['general'])
 		csv_contents = csv_io.getvalue()
-		csv_contents = re.sub(r'NaT', csv_null_rep, csv_contents)
+		csv_contents = re.sub(r'NaT', self.null_identifier['general'], csv_contents)
 		csv_io.seek(0)
 		csv_io.write(csv_contents)
 
@@ -82,7 +82,7 @@ class PostgresPandas(object):
 		csv_io.seek(0)
 		cur.copy_from(csv_io, '{0}.{1}'.format(schema_name, table_name),
 					  columns=dataframe_for_upload.columns.tolist(),
-					  sep=csv_sep, null=csv_null_rep)
+					  sep=csv_sep, null=self.null_identifier['general'])
 		csv_io.close()
 
 		self.close_database_connectors(engine, conn, cur)
