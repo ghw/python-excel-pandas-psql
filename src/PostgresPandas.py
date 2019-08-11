@@ -34,7 +34,7 @@ class PostgresPandas(object):
 		cur = conn.cursor()
 		return engine, conn, cur
 
-	def close_database_connectors(self, engine=None, conn=None, cur=None):
+	def close_database_connectors(self, conn=None, cur=None):
 		conn.commit()
 		cur.close()
 		conn.close()
@@ -43,7 +43,7 @@ class PostgresPandas(object):
 	def get_psql_query_results_as_dataframe(self, query=None):
 		engine, conn, cur = self.get_database_connectors()
 		df = pd.read_sql_query(query, con=engine)
-		self.close_database_connectors(engine, conn, cur)
+		self.close_database_connectors(conn, cur)
 		return df
 
 	# UNTESTED ...
@@ -85,7 +85,7 @@ class PostgresPandas(object):
 					  sep=csv_sep, null=self.null_identifier['general'])
 		csv_io.close()
 
-		self.close_database_connectors(engine, conn, cur)
+		self.close_database_connectors(conn, cur)
 
 		self.update_null_in_columns(
 			schema_name=schema_name, table_name=table_name,
@@ -105,7 +105,7 @@ class PostgresPandas(object):
 	def execute_query(self, query=None):
 		engine, conn, cur = self.get_database_connectors()
 		cur.execute(query)
-		self.close_database_connectors(engine, conn, cur)
+		self.close_database_connectors(conn, cur)
 		return
 
 	def drop_table(self, schema_name=None, table_name=None):
@@ -126,8 +126,6 @@ class PostgresPandas(object):
 		return
 
 	def correct_float_columns(self, dataframe=None):
-		if null_identifier is None: null_identifier = -1234567890
-
 		float_32_column_list = self.get_column_names_by_type(dataframe=dataframe, column_dtype='float32')
 		float_64_column_list = self.get_column_names_by_type(dataframe=dataframe, column_dtype='float64')
 		float_column_list = float_32_column_list + float_64_column_list
