@@ -34,9 +34,9 @@ class ExcelPostgres(PostgresPandas):
 			list_of_tuple_with_df_and_sheet = []
 			for dict_with_query_and_sheetname in list_of_dicts_with_query_and_sheet:
 				df = self.get_psql_query_results_as_dataframe(query=dict_with_query_and_sheetname['query'])
-				list_of_tuple_with_df_and_sheet.append(df, dict_with_query_and_sheetname['sheet'])
+				list_of_tuple_with_df_and_sheet.append((df, dict_with_query_and_sheetname['sheet']))
 
-			self.send_dataframe_to_excel_file(
+			self.excel_pandas.send_dataframe_to_excel_file(
 				file=filepath, dataframe_to_sheet_name_tuple_list=list_of_tuple_with_df_and_sheet, write_index=False
 			)
 
@@ -48,5 +48,5 @@ class ExcelPostgres(PostgresPandas):
 			file=file, sheet_name=sheet_name, skip_rows_list=skip_rows_list
 		)
 		if self.pd_func.get_row_count_from_dataframe(df) > 0:
-			self.send_dataframe_to_psql(self, dataframe=df, schema_name=schema_name, table_name=table_name)
+			self.excel_pandas.send_dataframe_to_psql(self, dataframe=df, schema_name=schema_name, table_name=table_name)
 		return
