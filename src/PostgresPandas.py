@@ -51,8 +51,6 @@ class PostgresPandas(PandasFunc):
 		if table_name is None: return
 		if schema_name is None: schema_name = 'public'
 
-		engine, conn, cur = self.get_database_connectors()
-
 		dataframe_for_upload = dataframe.copy()
 
 		self.correct_float_columns(dataframe_for_upload)
@@ -64,26 +62,7 @@ class PostgresPandas(PandasFunc):
 			column_name_type_dict=self.get_dict_of_column_name_to_type_from_dataframe_for_psql(dataframe_for_upload)
 		)
 
-		# general csv features
-		csv_sep = '\t'
-
-		# save dataframe as temp csv
-		csv_io = io.StringIO()
-		dataframe_for_upload.to_csv(csv_io, sep=csv_sep, encoding='utf-8-sig',
-									header=False, index=False, na_rep=self.null_identifier['general'])
-		csv_contents = csv_io.getvalue()
-		csv_contents = re.sub(r'NaT', self.null_identifier['general'], csv_contents)
-		csv_io.seek(0)
-		csv_io.write(csv_contents)
-
-		# copy from temp csv to psql table
-		csv_io.seek(0)
-		cur.copy_from(csv_io, '{0}.{1}'.format(schema_name, table_name),
-					  columns=dataframe_for_upload.columns.tolist(),
-					  sep=csv_sep, null=self.null_identifier['general'])
-		csv_io.close()
-
-		self.close_database_connectors(conn, cur)
+		self.upload_dataframe_to_psql(dataframe=dataframe_for_upload, schema_name=schema_name, table_name=table_name)
 
 		self.update_null_in_columns(
 			schema_name=schema_name, table_name=table_name,
@@ -93,6 +72,32 @@ class PostgresPandas(PandasFunc):
 			schema_name=schema_name, table_name=table_name,
 			dataframe=dataframe_for_upload, column_dtype='int32'
 		)
+
+		return
+
+	def upload_dataframe_to_psql(self, dataframe=None, schema_name=None, table_name=None):
+		engine, conn, cur = self.get_database_connectors()
+
+		# general csv features
+		csv_sep = '\t'
+
+		# save dataframe as temp csv
+		csv_io = io.StringIO()
+		dataframe.to_csv(csv_io, sep=csv_sep, encoding='utf-8-sig',
+						 header=False, index=False, na_rep=self.null_identifier['general'])
+		csv_contents = csv_io.getvalue()
+		csv_contents = re.sub(r'NaT', self.null_identifier['general'], csv_contents)
+		csv_io.seek(0)
+		csv_io.write(csv_contents)
+
+		# copy from temp csv to psql table
+		csv_io.seek(0)
+		cur.copy_from(csv_io, '{0}.{1}'.format(schema_name, table_name),
+					  columns=dataframe.columns.tolist(),
+					  sep=csv_sep, null=self.null_identifier['general'])
+		csv_io.close()
+
+		self.close_database_connectors(conn, cur)
 
 		return
 
