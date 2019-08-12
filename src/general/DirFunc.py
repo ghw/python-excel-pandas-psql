@@ -12,7 +12,7 @@ class DirFunc(object):
 	def __init__(self):
 		pass
 
-	def get_file_location(self, file=None):
+	def get_location_directory_of_a_file(self, file=None):
 		if file is None: return None
 		return os.path.dirname(file)
 
@@ -30,7 +30,7 @@ class DirFunc(object):
 			return True
 		return False
 
-	def remove_temporary_files(self, file_list=None):
+	def get_filtered_list_without_temporary_files(self, file_list=None):
 		"""
 		Gets rid of temporary files, which has filename in the format ~$xyz.ext.
 		:param file_list: list of filenames
@@ -53,7 +53,7 @@ class DirFunc(object):
 		else:
 			file_pattern = os.path.join(folder_path, pattern)
 		all_files = glob.glob(file_pattern, recursive=recursive)
-		all_files = self.remove_temporary_files(file_list=all_files)
+		all_files = self.get_filtered_list_without_temporary_files(file_list=all_files)
 		return all_files
 
 	def get_latest_file(self, folder_path=None, pattern=None):

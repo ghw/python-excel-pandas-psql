@@ -69,4 +69,4 @@ def test_014_text_to_snake_case_from_camel():
 
 
 def test_015_text_to_snake_case_from_normal():
-	assert str_func.text_to_snake_case('abc def yyyy/mm-dd 123', case='lower') == 'abc_def_yyyy_mm_dd123'
+	assert str_func.text_to_snake_case('abc def yyyy/mm-dd 123', case='lower') == 'abc_def_yyyy_mm_dd_123'

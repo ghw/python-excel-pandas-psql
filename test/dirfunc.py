@@ -38,7 +38,7 @@ def test_001_create_temporary_files_and_folder():
 
 
 def test_002_get_file_location():
-	assert dir_func.get_file_location(
+	assert dir_func.get_location_directory_of_a_file(
 		file=os.path.join('test_folder', 'file_1.log')
 	) == os.path.join('test_folder')
 
@@ -65,7 +65,7 @@ def test_006_exists_folder_where_doesnot_exist():
 
 
 def test_007_removing_temp_files():
-	assert dir_func.remove_temporary_files(
+	assert dir_func.get_filtered_list_without_temporary_files(
 		file_list=['~$abc.xlsx', 'abc.xlsx']
 	) == ['abc.xlsx']
 

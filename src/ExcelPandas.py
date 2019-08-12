@@ -33,7 +33,7 @@ class ExcelPandas(PandasFunc):
 		if write_index is None: write_index = False
 		if file is None: return
 
-		folder = self.dir_func.get_file_location(file=file)
+		folder = self.dir_func.get_location_directory_of_a_file(file=file)
 		if folder in [None, '']:
 			folder = os.getcwd()
 			file = os.path.join(folder, file)
