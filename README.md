@@ -31,7 +31,7 @@ $ sudo apt-get install -y python3-pip
 └── requirements.txt             # Necessary python libraries
 ```
 
-### Using the modules
+### Modules
 
 #### _ExcelPandas()_
 A class that contains functions to connect pandas dataframes and excel sheets:
@@ -49,13 +49,17 @@ A class that contains functions to connect psql database and excel sheets:
 1. get psql query results excel sheets
 1. send excel to psql database table
 
-#### _DateFunc()_
+#### _Dependent modules_
+
+These modules rely on following classes:
+
+###### _DateFunc()_
 A class that contains functions with some frequent operations on date objects (datetime and pandas.*.Timestamp):
 1. get year from the object
 1. create datetime object from text
 1. get different in year between two dates
 
-#### _DirFunc()_
+###### _DirFunc()_
 A class that contains functions with some frequent operations on directories:
 1. get location directory from a filepath
 1. get basename from a filepath
@@ -66,14 +70,14 @@ A class that contains functions with some frequent operations on directories:
 1. get latest file from a directory
 1. get absolute path of a file
 
-#### _ListFunc()_
+###### _ListFunc()_
 A class that contains functions with some frequent operations on lists:
 1. get filtered list with unique elements
 1. get common items between two lists
 1. get all items of two lists
 1. get flattened list
 
-#### _StrFunc()_
+###### _StrFunc()_
 A class that contains functions with some frequent operations on string objects:
 1. check if string is camelCase
 1. remove accent
@@ -83,7 +87,7 @@ A class that contains functions with some frequent operations on string objects:
 1. convert camel case to snake case
 1. convert text to snake case
 
-#### _PandasFunc()_
+###### _PandasFunc()_
 A class that contains functions with some frequent operations on pandas dataframe:
 1. get row count
 1. get dictionary based on two columns
