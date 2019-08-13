@@ -25,7 +25,7 @@ class PostgresPandas(PandasFunc):
 		self.username = username
 		self.password = password
 
-	def get_database_connectors(self):
+	def __get_database_connectors(self):
 		db_conn_string = 'postgresql://{0}:{1}@{2}/{3}'.format(
 			self.username, self.password, self.host, self.database
 		)
@@ -34,16 +34,16 @@ class PostgresPandas(PandasFunc):
 		cur = conn.cursor()
 		return engine, conn, cur
 
-	def close_database_connectors(self, conn=None, cur=None):
+	def __close_database_connectors(self, conn=None, cur=None):
 		conn.commit()
 		cur.close()
 		conn.close()
 		return
 
 	def get_psql_query_results_as_dataframe(self, query=None):
-		engine, conn, cur = self.get_database_connectors()
+		engine, conn, cur = self.__get_database_connectors()
 		df = pd.read_sql_query(query, con=engine)
-		self.close_database_connectors(conn, cur)
+		self.__close_database_connectors(conn, cur)
 		return df
 
 	def send_dataframe_to_psql(self, dataframe=None, schema_name=None, table_name=None):
@@ -53,30 +53,30 @@ class PostgresPandas(PandasFunc):
 
 		dataframe_for_upload = dataframe.copy()
 
-		self.correct_float_columns(dataframe_for_upload)
+		self.__correct_float_columns(dataframe_for_upload)
 		self.set_column_names_to_alpha_numeric(dataframe_for_upload)
 		self.set_column_names_to_snake_case(dataframe_for_upload)
-		self.clean_delimiter_in_object_columns_from_dataframe(dataframe_for_upload)
-		self.create_table(
+		self.__clean_delimiter_in_object_columns_from_dataframe(dataframe_for_upload)
+		self.__create_table(
 			schema_name=schema_name, table_name=table_name,
-			column_name_type_dict=self.get_dict_of_column_name_to_type_from_dataframe_for_psql(dataframe_for_upload)
+			column_name_type_dict=self.__get_dict_of_column_name_to_type_from_dataframe_for_psql(dataframe_for_upload)
 		)
 
-		self.upload_dataframe_to_psql(dataframe=dataframe_for_upload, schema_name=schema_name, table_name=table_name)
+		self.__upload_dataframe_to_psql(dataframe=dataframe_for_upload, schema_name=schema_name, table_name=table_name)
 
-		self.update_null_in_columns(
+		self.__update_null_in_columns(
 			schema_name=schema_name, table_name=table_name,
 			dataframe=dataframe_for_upload, column_dtype='int64'
 		)
-		self.update_null_in_columns(
+		self.__update_null_in_columns(
 			schema_name=schema_name, table_name=table_name,
 			dataframe=dataframe_for_upload, column_dtype='int32'
 		)
 
 		return
 
-	def upload_dataframe_to_psql(self, dataframe=None, schema_name=None, table_name=None):
-		engine, conn, cur = self.get_database_connectors()
+	def __upload_dataframe_to_psql(self, dataframe=None, schema_name=None, table_name=None):
+		engine, conn, cur = self.__get_database_connectors()
 
 		# general csv features
 		csv_sep = '\t'
@@ -97,38 +97,38 @@ class PostgresPandas(PandasFunc):
 					  sep=csv_sep, null=self.null_identifier['general'])
 		csv_io.close()
 
-		self.close_database_connectors(conn, cur)
+		self.__close_database_connectors(conn, cur)
 
 		return
 
-	def get_psql_array_format_of_python_list(self, python_list=None):
+	def __get_psql_array_format_of_python_list(self, python_list=None):
 		psql_array = '({0})'.format(str(python_list)[1:-1])
 		return psql_array
 
-	def execute_query(self, query=None):
-		engine, conn, cur = self.get_database_connectors()
+	def __execute_query(self, query=None):
+		engine, conn, cur = self.__get_database_connectors()
 		cur.execute(query)
-		self.close_database_connectors(conn, cur)
+		self.__close_database_connectors(conn, cur)
 		return
 
-	def drop_table(self, schema_name=None, table_name=None):
+	def __drop_table(self, schema_name=None, table_name=None):
 		del_command = 'DROP TABLE IF EXISTS {0}."{1}";'.format(schema_name, table_name)
-		self.execute_query(del_command)
+		self.__execute_query(del_command)
 		return
 
-	def create_table_as(self, query=None, schema_name=None, table_name=None):
+	def __create_table_as(self, query=None, schema_name=None, table_name=None):
 		create_command = 'CREATE TABLE {0}."{1}" AS {2}'.format(schema_name, table_name, query)
-		self.execute_query(query=create_command)
+		self.__execute_query(query=create_command)
 		return
 
-	def create_table(self, schema_name=None, table_name=None, column_name_type_dict=None):
+	def __create_table(self, schema_name=None, table_name=None, column_name_type_dict=None):
 		column_types = ', '.join(['{0} {1}'.format(col_n, col_t)
 								  for col_n, col_t in column_name_type_dict.items()])
 		create_command = 'CREATE TABLE {0}."{1}" ({2});'.format(schema_name, table_name, column_types)
-		self.execute_query(query=create_command)
+		self.__execute_query(query=create_command)
 		return
 
-	def correct_float_columns(self, dataframe=None):
+	def __correct_float_columns(self, dataframe=None):
 		float_32_column_list = self.get_column_names_by_type(dataframe=dataframe, column_dtype='float32')
 		float_64_column_list = self.get_column_names_by_type(dataframe=dataframe, column_dtype='float64')
 		float_column_list = float_32_column_list + float_64_column_list
@@ -140,7 +140,7 @@ class PostgresPandas(PandasFunc):
 				dataframe[float_col] = dataframe[float_col].fillna(self.null_identifier['int64']).astype(int)
 		return
 
-	def get_dict_of_column_name_to_type_from_dataframe_for_psql(self, dataframe=None):
+	def __get_dict_of_column_name_to_type_from_dataframe_for_psql(self, dataframe=None):
 		pandas_dtype_to_psql_column_type_dict = {
 			"int64": "int",
 			"int32": "int",
@@ -167,7 +167,7 @@ class PostgresPandas(PandasFunc):
 
 		return psql_column_name_type_dict
 
-	def clean_delimiter_in_object_columns_from_dataframe(self, dataframe=None):
+	def __clean_delimiter_in_object_columns_from_dataframe(self, dataframe=None):
 		object_column_list = self.get_column_names_by_type(dataframe=dataframe, column_dtype='object')
 		for obj_col in object_column_list:
 			dataframe[obj_col] = dataframe[obj_col].str. \
@@ -177,17 +177,17 @@ class PostgresPandas(PandasFunc):
 				replace('"', '\'', regex=True). \
 				replace(',', '\|', regex=True)
 		return
-
-	def update_null_in_columns(self, dataframe=None, column_dtype=None, schema_name=None, table_name=None):
+s
+	def __update_null_in_columns(self, dataframe=None, column_dtype=None, schema_name=None, table_name=None):
 		int_columns = self.get_column_names_by_type(dataframe=dataframe, column_dtype=column_dtype)
 		if len(int_columns) < 1: return
 
 		update_command = ''
 		for int_col in int_columns:
 			update_command += '''
-				UPDATE {0}.{1}
+	s			UPDATE {0}.{1}
 				SET {2} = NULL
 				WHERE {2} = {3};
 				'''.format(schema_name, table_name, int_col, self.null_identifier[column_dtype])
-		self.execute_query(query=update_command)
+		self.__execute_query(query=update_command)
 		return
