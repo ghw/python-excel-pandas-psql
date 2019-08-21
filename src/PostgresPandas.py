@@ -177,7 +177,7 @@ class PostgresPandas(PandasFunc):
 				replace('"', '\'', regex=True). \
 				replace(',', '\|', regex=True)
 		return
-s
+
 	def __update_null_in_columns(self, dataframe=None, column_dtype=None, schema_name=None, table_name=None):
 		int_columns = self.get_column_names_by_type(dataframe=dataframe, column_dtype=column_dtype)
 		if len(int_columns) < 1: return
@@ -185,7 +185,7 @@ s
 		update_command = ''
 		for int_col in int_columns:
 			update_command += '''
-	s			UPDATE {0}.{1}
+				UPDATE {0}.{1}
 				SET {2} = NULL
 				WHERE {2} = {3};
 				'''.format(schema_name, table_name, int_col, self.null_identifier[column_dtype])
